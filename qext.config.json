@@ -1,0 +1,14 @@
+{
+  "extension": "Collapsible Accordion",
+  "mode": "compile",
+  "output": "./dist",
+  "compile": {
+    "entry": "./src/index.js",
+    "qext": "./src/index.qext",
+    "static": "./static"
+  },
+  "deploy": "desktop",
+  "desktopConfig": {
+    "destination": "C:\\Users\\ChrisBraley\\Documents\\Qlik\\Sense\\Extensions"
+  }
+}

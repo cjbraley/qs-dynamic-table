@@ -1,0 +1,136 @@
+.chart-container{
+    height: 100%;
+    min-width: 470px;
+    overflow: scroll;
+    padding-right: 5px;
+}
+.accordion__parent-menu{
+    list-style: none;
+    padding-left: 0;
+}
+
+.accordion__sub-menu{
+    list-style: none;
+    margin-left: 30px;
+    padding-left: 0;
+}
+
+.accordion__parent-item{
+    overflow: hidden;
+}
+
+.accordion__sub-item{
+    overflow: hidden;
+    margin-top: 3px;
+}
+
+.accordion__row{
+    padding: 5px 20px;
+    background-color: #FAFAFD;
+    border: 1px solid #CFCFCF;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    cursor: pointer;
+}
+
+.accordion__row:hover{
+    border: 1px solid #BBB;
+    background-color: #EAEAED;
+}
+
+.accordion__parent-item > .accordion__row{
+    background-color: #E6EBF2;
+    margin-top: 5px;
+}
+
+.accordion__parent-item > .accordion__row:hover{
+    background-color: #D6DBE2;
+}
+
+.accordion__row--last{
+    background-color: #FFF;
+    cursor: default;
+}
+
+.accordion__row--last:hover{
+    background-color: #FFFF;
+    cursor: default;
+    margin-top: none;
+}
+
+.accordion__text{
+    font-weight: bold;
+    white-space: pre-wrap;
+}
+
+.accordion__row--last .accordion__text{
+    font-weight: normal;
+}
+
+
+.accordion__children{
+      overflow: hidden;
+  }
+
+.accordion__sub-item--last {
+    margin-left: -30px;
+    margin-top: 0;
+}
+
+.accordion__sub-item--last > .accordion__row{
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+  .accordion__input{
+      padding: 2px 5px;
+      width: 50%;
+      max-width: 250px;
+  }
+
+  .accordion__label{
+      font-weight: bold;
+  }
+
+
+.accordion__btn{
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1.0875rem;
+    font-family: 'Lato',sans-serif;
+    font-weight: 500;
+    height: 35px;
+    width: 100px;
+}
+
+.accordion__btn--selection{
+    height: fit-content;
+    font-size: 13px;
+    background-color:rgb(0, 152, 69);
+    color: white;
+    margin-left: 5px;
+    padding: 5px 8px;
+    border: 1px solid #eee
+}
+
+.accordion__btn--selection:hover{
+    border: 1px solid #666;
+    background-color:rgba(0, 152, 69,0.9);
+    transition: all 1s;
+
+}
+
+/* .sample-show-hide {
+    transition: all ease 0.30s;
+  }
+
+.sample-show-hide.ng-hide {
+    opacity: 0;
+    transform: translateY(-100%);
+    height: 0;
+  } */
