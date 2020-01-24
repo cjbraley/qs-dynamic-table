@@ -1,9 +1,23 @@
-.chart-container{
-    height: 100%;
+.accordion__chart-container{
+    height: calc(100% - 2.4rem);
     min-width: 470px;
     overflow: scroll;
     padding-right: 5px;
+    padding-bottom: 5px;
+    margin-top: 0.2rem;
+    border-top: 1px solid #DDD;
+    /* border-bottom: 1px solid #DDD; */
 }
+
+.accordion__controls-container{
+    min-width: 470px;
+    padding-right: 5px;
+    width: 100%;
+    z-index: 100;
+    
+}
+
+
 .accordion__parent-menu{
     list-style: none;
     padding-left: 0;
@@ -13,7 +27,26 @@
     list-style: none;
     margin-left: 30px;
     padding-left: 0;
+    max-height: 0;
+    transform: translateY(-100%);
+    transition: all 0.4s cubic-bezier(0.420, 0.000, 0.580, 1.000) 0s;
 }
+
+.accordion__sub-menu.expanded{
+    max-height: none;
+    transform: translateY(0);
+    transition: all 0.4s cubic-bezier(0.420, 0.000, 0.580, 1.000) 0s;
+    
+}
+
+.accordion__children{
+    max-height: 0;
+}
+
+
+.accordion__children.expanded{
+  max-height: none;
+} 
 
 .accordion__parent-item{
     overflow: hidden;
@@ -23,6 +56,8 @@
     overflow: hidden;
     margin-top: 3px;
 }
+
+
 
 .accordion__row{
     padding: 5px 20px;
@@ -104,12 +139,11 @@
     font-size: 1.0875rem;
     font-family: 'Lato',sans-serif;
     font-weight: 500;
-    height: 35px;
+    height: 28px;
     width: 100px;
 }
 
 .accordion__btn--selection{
-    height: fit-content;
     font-size: 13px;
     background-color:rgb(0, 152, 69);
     color: white;

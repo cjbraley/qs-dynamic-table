@@ -96,7 +96,7 @@ export default async function ($element, layout, self, qlik, $) {
 	// array.reduce(function(o, s) { return o[s] = {}; }, object);
 	// console.log(object);
 
-	// console.log(data)
+	console.log(data)
 	// console.log(hypercube)
 	// console.log(state);
 
