@@ -1,10 +1,10 @@
 <script type="text/ng-template" id="recursiveComponent">
     <div class="accordion__row" ng-class="{'accordion__row--last': child.children.length === 0}" ng-click="toggleExpanded($event, child)">
-        <span  class="accordion__text">{{ child.value }}</span>
+        <span  class="accordion__text" ng-bind-html="child.displayValue"></span>  
     </div>
     <div class="accordion__children" ng-class="{'expanded': child.expanded}"  ng-if="child.children.length > 0">
-        <ul ng-if="child.children && child.search" class="accordion__sub-menu" ng-class="{'expanded': child.expanded}">
-            <li ng-if="child.search" ng-repeat="child in child.children track by child.id" class="accordion__sub-item" ng-class="{'accordion__sub-item--last': child.children.length === 0}" ng-include="'recursiveComponent'"></li>
+        <ul ng-if="child.children && child.search && child.included" class="accordion__sub-menu" ng-class="{'expanded': child.expanded}">
+            <li ng-if="child.search && child.included" ng-repeat="child in child.children track by child.id" class="accordion__sub-item" ng-class="{'accordion__sub-item--last': child.children.length === 0}" ng-include="'recursiveComponent'"></li>
         </ul>
     </div>
 </script>
@@ -18,7 +18,7 @@
 <div class="accordion__chart-container">
     <div>
         <ul class="accordion__parent-menu">
-            <li ng-repeat="child in data track by child.id" class="accordion__parent-item" ng-if="child.search" ng-include="'recursiveComponent'"></li>
+            <li ng-repeat="child in display track by child.id" class="accordion__parent-item" ng-if="child.search && child.included" ng-include="'recursiveComponent'"></li>
         </ul>
     </div>
 </div>

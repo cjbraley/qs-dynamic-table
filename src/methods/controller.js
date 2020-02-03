@@ -6,42 +6,24 @@ export default [
 		// everything that is static can be defined here (things we don't need to repeat in pain or resize)
 
 		$scope.data = {};
+		$scope.searchString = '';
+
 
 		// need to keep the state of what is expanded and what is collapsed
 		// $scope.state = {};
 
-		$scope.updateState = function (state, data) {
-			state.map(stateRow => {
-				data.map(dataRow => {
-					if (stateRow.id === dataRow.id) {
-						// debugger
-						stateRow.expanded = dataRow.expanded;
-						if (stateRow.children.length > 0 && dataRow.children.length > 0) {
-							$scope.updateState(stateRow.children, dataRow.children)
-						}
-					}
-				})
-			})
-		}
 
 		$scope.toggleExpanded = function (event, item) {
 			event.stopPropagation()
-			// update data
 			item.expanded = !item.expanded;
-			// update state
-			$scope.updateState($scope.state, $scope.data)
-
-
-			// if(!item.expanded){
-			//     $scope.collapseChildren(item);
-			// }
-
 		}
 
 		// Expand All / collapse all function
 		$scope.toggleAll = function (arr, toState) {
 			arr.map(arrRow => {
-				arrRow.expanded = toState;
+				if(arrRow.included && arrRow.search){
+					arrRow.expanded = toState;
+				}
 				if (arrRow.children.length > 0) {
 					$scope.toggleAll(arrRow.children, toState)
 				}
@@ -49,21 +31,19 @@ export default [
 		}
 
 		$scope.expandAll = function () {
-			console.log('ran')
-			$scope.toggleAll($scope.data, true)
-			$scope.toggleAll($scope.state, true)
+			$scope.toggleAll($scope.display, true)
 		}
 
 		$scope.collapseAll = function () {
-			$scope.toggleAll($scope.data, false)
-			$scope.toggleAll($scope.state, false)
+			$scope.toggleAll($scope.display, false)
 		}
 
 		// Search function
 		$scope.searchText = function (arr, text, parentMatch) {
+			$scope.searchInProgress = true;
 			let searchMatch;
 			arr.map(arrRow => {
-				if(!arrRow.value){
+				if (!arrRow.value) {
 					arrRow.search = false;
 					searchMatch = false;
 					return
@@ -98,10 +78,44 @@ export default [
 
 		}
 
-		$scope.searchUpdate = function(text) {
-			// console.log(event)
-			$scope.searchText($scope.data, text, false)
-			// console.log($scope.data)
+		$scope.highlightSearchText = function (arr, text) {
+			const display = arr.map(arrRow => {
+				let value = arrRow.value;
+				let children = arrRow.children;
+				if (arrRow.value && text.length > 2) {
+					const exp = new RegExp(text, "gi")
+					value = value.replace(exp, `<span class="highlight">$&</span>`);
+				}
+				if (arrRow.children.length > 0) {
+					children = $scope.highlightSearchText(arrRow.children, text)
+				}
+				return {
+					...arrRow,
+					displayValue: value,
+					children: children
+				}
+			})
+
+			$scope.searchInProgress = false;
+			return display;
+
+		}
+
+
+		$scope.searchUpdate = debounce(function (text) {
+			$scope.searchString = text;
+			$scope.searchText($scope.display, text, false);
+			$scope.display = $scope.highlightSearchText($scope.display, text)
+		},200)
+
+		function debounce(func, delay) { 
+			let debounceTimer 
+			return function() { 
+				const context = this
+				const args = arguments 
+					clearTimeout(debounceTimer) 
+					debounceTimer = setTimeout(() => func.apply(context, args), delay) 
+			} 
 		}
 
 

@@ -1,3 +1,7 @@
+.highlight {
+    background-color: #93f197;
+}
+
 .accordion__chart-container{
     height: calc(100% - 2.4rem);
     min-width: 470px;
@@ -6,6 +10,7 @@
     padding-bottom: 5px;
     margin-top: 0.2rem;
     border-top: 1px solid #DDD;
+    overflow: auto;
     /* border-bottom: 1px solid #DDD; */
 }
 
