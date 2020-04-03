@@ -1,184 +1,118 @@
 
 export default async function ($element, layout, self, qlik, $) {
 
+
+
 	// This runs when the data is changed or a property is changed but not when the chart is resized
-	// console.log("Paint ran")
 
-
-	// HELPER FUNCTIONS
-
-
-	// const initState = (dataArr) => {
-	// 	debugger;
-	// 	dataArr.map(level => {
-	// 		level.expanded = false;
-	// 		if(level.children.length > 0){
-	// 			initState(level)
-	// 		}
-	// 	})
-	// }
-
-	function handleDataUpdate(displayArr, dataArr) {
-		let isInDisplay = null;
-		let isInData = null;
-		displayArr.map(displayRow => {
-			isInData = false;
-			dataArr.map(dataRow => {
-				// if exists in both
-				if (displayRow.id === dataRow.id) {
-					isInData = true;
-					displayRow.included = true;
-					if (displayRow.children.length > 0 && dataRow.children.length > 0) {
-						handleDataUpdate(displayRow.children, dataRow.children)
-					}
-				}
-			})
-			if (!isInData) {
-				displayRow.included = false;
-				// set all children of displayRow to have included = false
-				if (displayRow.children.length > 0) {
-					setPropertyRecursive(displayRow.children, 'included', false)
-				}
-			}
-		})
-
-		// Find what's in data but not in display
-		dataArr.map(dataRow => {
-			isInDisplay = false;
-			displayArr.map(displayRow => {
-				// if exists in both
-				if (displayRow.id === dataRow.id) {
-					isInDisplay = true;
-				}
-			})
-
-			if(!isInDisplay){
-				displayArr.push(dataRow);
-			}
-		})
-	}
-
-	function setPropertyRecursive(arr, propertyName, value) {
-		arr.map(arrRow => {
-			arrRow[propertyName] = value;
-			if (arrRow.children.length) {
-				setPropertyRecursive(arrRow.children, propertyName, value);
-			}
-		})
-	}
-
-	// displayRow.included = true;
-	// if(displayRow.children.length > 0 && dataRow.children.length > 0){
-	// 	handleDataUpdate(displayRow.children, dataRow.children)
-	// }
 
 	//////////////////
 	// Init
 	/////////////////
+	const tableId = layout.props.tableId;
+	self.$scope.props.defaultItems = layout.props.defaultItems;
+	self.$scope.props.title = layout.props.title;
+
+
 	const state = self.$scope.state;
 	const hypercube = layout.qHyperCube;
 
-	const data = []
 
-	// Receive data and create a nested array
-	hypercube.qDataPages[0].qMatrix.map(qRow => {
-		qRow.reduce((acc, val) => {
-			const rowValue = val.qText;
-			const rowId = val.qElemNumber
-			// does this value exist at this level?
-
-			let existingValueIndex = -1;
-
-
-			for (var i = 0; i < acc.length; i++) {
-				if (acc[i].id === rowId) {
-					existingValueIndex = i;
-					break;
+	await self.$scope.app.getObjectProperties(tableId)
+		.then(reply => {
+			self.$scope.fullDimensions = reply.properties.qHyperCubeDef.qDimensions.map(dimension => {
+				return {
+					qLibraryId: dimension.qLibraryId,
+					qDef: dimension.qDef,
+					qCalcCondition: dimension.qCalcCondition,
+					qShowTotal: dimension.qShowTotal,
+					qShowAll: dimension.qShowAll,
+					qOtherTotalSpec: dimension.qOtherTotalSpec,
+					qNullSuppression: dimension.qNullSuppression,
+					label: dimension.qDef.qFieldLabels[0] ? dimension.qDef.qFieldLabels[0] : dimension.qDef.qFieldDefs[0],
 				}
-			}
+			})
 
-			if (existingValueIndex > -1) {
-				return acc[existingValueIndex].children
-			} else {
-				const newData = {
-					id: rowId,
-					value: rowValue,
-					displayValue: rowValue,
-					included: true,
-					expanded: false,
-					search: true,
-					children: []
+
+			self.$scope.fullMeasures = reply.properties.qHyperCubeDef.qMeasures.map(measure => {
+				return {
+					qLibraryId: measure.qLibraryId,
+					qDef: measure.qDef,
+					qCalcCondition: measure.qCalcCondition,
+					qSortBy: measure.qSortBy,
+					label: measure.qLabel ? measure.qDef.qLabel : measure.qDef.qDef
 				}
-				acc.push(newData)
-				return acc[acc.length - 1].children
-			}
-
-		}, data)
-
-	});
+			})
+		})
 
 
-	// If display doesn't exist, create display as data
-
-
-	if (!self.$scope.display) {
-		self.$scope.display = data;
-	} else {
-		handleDataUpdate(self.$scope.display, data)
+	if(!self.$scope.baseDimensions){
+		await self.$scope.createBaseDimensions(self.$scope.fullDimensions);
+	}
+	if(!self.$scope.baseMeasures){
+		await self.$scope.createBaseMeasures(self.$scope.fullMeasures);
 	}
 
-	// run the search process
-	self.$scope.searchUpdate(self.$scope.searchString)
+	
 
+	// create menuItems from base table
 
-	// Initialise state on display (expnaded = false everywhere)
+	self.$scope.menuDimensions = [];
+	self.$scope.menuMeasures = [];
 
+	self.$scope.fullDimensions.map(fullDim => {
+		return self.$scope.baseDimensions
+			.filter(tableDim => fullDim.qDef.cId === tableDim.cId && tableDim.qFallbackTitle)
+			.map(tableDim => {
+				self.$scope.menuDimensions.push({
+					cId: tableDim.cId,
+					label: tableDim.qFallbackTitle ? tableDim.qFallbackTitle : null,
+					isActive: fullDim.isActive,
+					type: "d"
+				})
+			}
+		)
+	})
 
-
-
-	// Otherwise loop through all values in data and display. Updates to display
-	// - If the value is in data but not in display, add it to display. Set "included" to true. Init expanded (false)
-	// - If the value is in in data and in display. Set "included" to true
-	// - If the value is not in data but is in display, set "included" to false.
-
-
-	// search through display
-	// if there is a match, set textmatch to true. Update the searchValue
-	// If there is no match set textMatch to false
-
-	// IF textmatch is true, show the searchValue ELSE show the normal value
-
-
-
-
-	// onSearchChange
-	// debounce the change
-	// Update the search string and run the search function
-
-	// expandAll 
-	// If "inclued" is true, set expanded to true
-
-	// collapseAll
-	// if "include" is true, set expanded to false
-
-
-
-
-	// Need something that looks for missing children and adds state segments
+	self.$scope.fullMeasures.map(fullMeasure => {
+		return self.$scope.baseMeasures
+			.filter(tableMeasure => fullMeasure.qDef.cId === tableMeasure.cId && tableMeasure.qFallbackTitle)
+			.map(tableMeasure => {
+				self.$scope.menuMeasures.push({
+					cId: tableMeasure.cId,
+					label: tableMeasure.qFallbackTitle ? tableMeasure.qFallbackTitle : null,
+					isActive: fullMeasure.isActive,
+					type: "m"
+				})
+			}
+		)
+	})
 
 
 
+	// // Close temporary table once menu info has been extracted
+	// self.$scope.baseDimensions = self.$scope.baseDimensions.close()
+	// self.$scope.baseMeasures = self.$scope.baseMeasures.close()
 
 
-	// Take the state and inject it into the display
-	// applyState(self.$scope.state, self.$scope.display)
+	self.$scope.updateStateItems();
+	self.$scope.updateMenuState();
+
+	// render table
+
+	if(!self.$scope.table){
+		// console.log("render table")
+		// this need to use activeDimensions
+		self.$scope.table = await self.$scope.createTable([],[]);
+		self.$scope.table.show("cbcr__table")
+			.then(reply => {
+				self.$scope.applyDefaultState()
+			})
+	}
 
 
 
-
-
-
+	return qlik.Promise.resolve();
 
 	// self.resize();
-	// console.log("end of paint");
 }

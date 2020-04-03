@@ -1,24 +1,36 @@
-<script type="text/ng-template" id="recursiveComponent">
-    <div class="accordion__row" ng-class="{'accordion__row--last': child.children.length === 0}" ng-click="toggleExpanded($event, child)">
-        <span  class="accordion__text" ng-bind-html="child.displayValue"></span>  
+<div class="cbcr__chart-container">
+    <div class="cbcr__items-menu">
+        <div class="cbcr__items-menu__dimensions">
+            <div class="cbcr__title">Dimensions:</div>
+            <ul class="cbcr__items-menu__list">
+                <li ng-repeat="dimension in menuDimensions track by dimension.cId" ng-click="menuToggleActive('d',dimension.cId)" ng-class="{'cbcr__active': dimension.isActive}" class="cbcr__items-menu__list-item">
+                    <span>{{dimension.label}}</span> 
+                    <div class="lui-icon lui-icon--tick" ng-if="dimension.isActive"></div>
+                </li>
+            </ul>
+        </div>
+        <div class="cbcr__items-menu__measures">
+            <div class="cbcr__title">Measures:</div>
+            <ul class="cbcr__items-menu__list">
+                <li ng-repeat="measure in menuMeasures track by measure.cId" ng-click="menuToggleActive('m',measure.cId)" ng-class="{'cbcr__active': measure.isActive}" class="cbcr__items-menu__list-item">
+                    <span>{{measure.label}}</span> 
+                    <div class="lui-icon lui-icon--tick" ng-if="measure.isActive"></div>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div class="accordion__children" ng-class="{'expanded': child.expanded}"  ng-if="child.children.length > 0">
-        <ul ng-if="child.children && child.search && child.included" class="accordion__sub-menu" ng-class="{'expanded': child.expanded}">
-            <li ng-if="child.search && child.included" ng-repeat="child in child.children track by child.id" class="accordion__sub-item" ng-class="{'accordion__sub-item--last': child.children.length === 0}" ng-include="'recursiveComponent'"></li>
-        </ul>
+    <div class="cbcr__buttons">
+        <div class="cbcr__title">{{ props.title }}</div>
+        <i title="Apply default state" class="lui-icon lui-icon--bookmark" ng-click="applyDefaultState()"></i>
+        <i title="Clear All" class="lui-icon lui-icon--clear-selections" ng-click="clearAll()"></i>
+        <i title="Export" class="lui-icon lui-icon--export" ng-click="exportData()"></i>
     </div>
-</script>
-
-<div class="accordion__controls-container">
-    <!-- <label for="search" class="accordion__label" ">Search</label> -->
-    <input type="text" name="search" id="search" class="accordion__input" placeholder="Search" ng-model="searchString" ng-change="searchUpdate(searchString)">
-    <button class="accordion__btn accordion__btn--selection" ng-click="expandAll()">Expand All</button>
-    <button class="accordion__btn accordion__btn--selection" ng-click="collapseAll()">Collapse All</button>
-</div>
-<div class="accordion__chart-container">
-    <div>
-        <ul class="accordion__parent-menu">
-            <li ng-repeat="child in display track by child.id" class="accordion__parent-item" ng-if="child.search && child.included" ng-include="'recursiveComponent'"></li>
-        </ul>
-    </div>
+    <ul class="cbcr__config" id="cbcr__config">
+        <li ng-repeat="item in state" class="cbcr__config__item" ng-class="{'cbcr__config__item--dimension': item.type === 'd', 'cbcr__config__item--measure': item.type === 'm'}">
+            <span>{{ item.label }}</span>
+            <i class="lui-icon lui-icon--remove" ng-click="removeButton(item.cId)"></i>
+        </li>
+    </ul>
+    <div class="cbcr__table" id="cbcr__table"></div>
+    <div class="cbcr__backdrop" ng-if="isUpdating"></div>
 </div>

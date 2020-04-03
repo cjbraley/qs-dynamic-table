@@ -1,5 +1,5 @@
 {
-  "extension": "Collapsible Accordion",
+  "extension": "CB Custom Report",
   "mode": "compile",
   "output": "./dist",
   "compile": {

@@ -1,6 +1,6 @@
 {
-	"name": "Collapsible Accordion",
-	"description": "Collapsible accordion used to display defintions, etc.",
+	"name": "CB Custom Report",
+	"description": "Qlik table where dimensions and measures can be selected dynamically.",
 	"type": "visualization",
 	"version": "1.0.0",
 	"icon": "extension",
