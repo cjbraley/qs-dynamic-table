@@ -1,11 +1,6 @@
 
 export default async function ($element, layout, self, qlik, $) {
 
-
-
-	// This runs when the data is changed or a property is changed but not when the chart is resized
-
-
 	//////////////////
 	// Init
 	/////////////////
@@ -53,7 +48,6 @@ export default async function ($element, layout, self, qlik, $) {
 		await self.$scope.createBaseMeasures(self.$scope.fullMeasures);
 	}
 
-	
 
 	// create menuItems from base table
 
@@ -89,14 +83,9 @@ export default async function ($element, layout, self, qlik, $) {
 	})
 
 
-
-	// // Close temporary table once menu info has been extracted
-	// self.$scope.baseDimensions = self.$scope.baseDimensions.close()
-	// self.$scope.baseMeasures = self.$scope.baseMeasures.close()
-
-
 	self.$scope.updateStateItems();
 	self.$scope.updateMenuState();
+
 
 	// render table
 
@@ -104,13 +93,12 @@ export default async function ($element, layout, self, qlik, $) {
 		// console.log("render table")
 		// this need to use activeDimensions
 		self.$scope.table = await self.$scope.createTable([],[]);
+		self.$scope.isLoading = false;
 		self.$scope.table.show("cbcr__table")
 			.then(reply => {
 				self.$scope.applyDefaultState()
 			})
 	}
-
-
 
 	return qlik.Promise.resolve();
 

@@ -58,7 +58,7 @@ export default function (tableList) {
 						component: 'text'
 					},
 					Version: {
-						label: 'Version: 1.0.0',
+						label: 'Version: 1.1.0',
 						component: 'text'
 					},
 					Author: {

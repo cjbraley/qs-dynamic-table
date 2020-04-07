@@ -7,14 +7,17 @@ export default function (app, qlik) {
 		"$element",
 		function ($scope, $element) {
 
-			// console.log("Controller started")
+			// INIT
 
-
-			// everything that is static can be defined here (things we don't need to repeat in pain or resize)
-
+			$scope.isLoading = true;
 			$scope.app = app;
+			$scope.mode = 'table';
 			$scope.props = {};
-			$scope.state = [];
+			$scope.state = {
+				column: [],
+				row: [],
+				measure: []
+			}
 			$scope.table = undefined;
 			$scope.baseTable = undefined;
 			$scope.menuDimensions = []
@@ -22,6 +25,41 @@ export default function (app, qlik) {
 			$scope.activeDimensions = [];
 			$scope.activeMeasures = [];
 
+
+			$('#cbcr__column, #cbcr__row').sortable({
+				connectWith: ".connected-sortable",
+				opacity: 0.6,
+				start: function (event, ui) {
+					$scope.sortOriginIndex = ui.item.index();
+					$scope.sortOriginList = event.target.id.split('__')[1];
+				},
+				update: function (event, ui) {
+					if (this === ui.item.parent()[0]) {
+						const sortTargetIndex = ui.item.index();
+						const sortTargetList = event.target.id.split('__')[1];
+						const removed = $scope.state[$scope.sortOriginList].splice($scope.sortOriginIndex, 1)[0];
+						$scope.state[sortTargetList].splice(sortTargetIndex, 0, removed)
+						$scope.updateTable()
+					}
+
+				}
+			}).disableSelection();
+
+			$('#cbcr__measure').sortable({
+				opacity: 0.6,
+				start: function(event, ui){
+					$scope.sortOriginIndex = ui.item.index();
+				},
+				update: function(event, ui){
+					const sortTargetIndex = ui.item.index();
+					const removed = $scope.state.measure.splice($scope.sortOriginIndex, 1)[0];
+					$scope.state.measure.splice(sortTargetIndex, 0, removed)
+					$scope.updateTable()
+				}
+			}).disableSelection();
+
+
+			// PAINT FUNCTIONS
 
 			$scope.createBaseDimensions = async function (dimensions) {
 				$scope.baseDimensions = new Array(dimensions.length);
@@ -40,12 +78,9 @@ export default function (app, qlik) {
 					}, function (reply) {
 						$scope.baseDimensions[index] = reply.qHyperCube.qDimensionInfo[0]
 					})
-
 					i++
 				}
-
-
-			}
+			};
 
 			$scope.createBaseMeasures = async function (measures) {
 				$scope.baseMeasures = new Array(measures.length);
@@ -63,68 +98,60 @@ export default function (app, qlik) {
 					}, function (reply) {
 						$scope.baseMeasures[index] = reply.qHyperCube.qMeasureInfo[0]
 					})
-
 					i++
 				}
-			}
-
+			};
 
 			$scope.createTable = async function (dimensions, measures) {
-
-				return $scope.app.visualization.create('table',
+				return $scope.app.visualization.create($scope.mode,
 					[
 						...dimensions,
 						...measures,
 					],
 				)
+			};
 
-			}
+			$scope.updateStateItems = function () {
+				let exists;
+				$scope.state.column = $scope.state.column.filter(item => {
+					$scope.menuDimensions.map(dimension => {
+						if (dimension.cId === item.cId) {
+							item.label = dimension.label;
+							exists = true
+						}
+					})
+					return exists;
+				})
 
+				$scope.state.row = $scope.state.row.filter(item => {
+					let exists = false
+					$scope.menuDimensions.map(dimension => {
+						if (dimension.cId === item.cId) {
+							item.label = dimension.label;
+							exists = true
+						}
+					})
+					return exists;
+				})
 
-
-			$scope.sortConfig = {
-				animation: 150,
-				ghostClass: "cbcr__ghost",
-				onSort: function (event) {
-					const removed = $scope.state.splice(event.oldIndex, 1)[0];
-					$scope.state.splice(event.newIndex, 0, removed)
-					$scope.updateTable()
-				}
-			}
-
-			const sortContainer = document.getElementById('cbcr__config');
-			const sortable = Sortable.create(sortContainer, $scope.sortConfig);
-
-
-			$scope.menuToggleActive = function (type, id) {
-				if (type === 'd') {
-					if (this.dimension.isActive) {
-						$scope.removeItemById(id)
-					} else {
-						$scope.addToState({
-							cId: id,
-							label: this.dimension.label,
-							type: "d"
-						})
-					}
-				}
-
-				if (type === 'm') {
-					if (this.measure.isActive) {
-						$scope.removeItemById(id)
-					} else {
-						$scope.addToState({
-							cId: id,
-							label: this.measure.label,
-							type: "m"
-						})
-					}
-				}
-				$scope.updateTable()
-			}
+				$scope.state.measure = $scope.state.measure.filter(item => {
+					let exists = false
+					$scope.menuMeasures.map(measure => {
+						if (measure.cId === item.cId) {
+							item.label = measure.label;
+							exists = true
+						}
+					})
+					return exists;
+				})
+			};
 
 			$scope.updateMenuState = function () {
-				$scope.state.map(item => {
+				[
+					...$scope.state.column,
+					...$scope.state.row,
+					...$scope.state.measure,
+				].map(item => {
 					$scope.menuDimensions.map(dimension => {
 						if (dimension.cId === item.cId) {
 							dimension.isActive = true;
@@ -137,41 +164,108 @@ export default function (app, qlik) {
 						}
 					})
 				})
-			}
+			};
 
-			$scope.updateStateItems = function () {
 
-				$scope.state = $scope.state.filter(item => {
-					let exists = false
-					$scope.menuDimensions.map(dimension => {
-						if (dimension.cId === item.cId) {
-							item.label = dimension.label;
-							exists = true
-						}
-					})
+			// BUTTON FUNCTIONS
 
-					$scope.menuMeasures.map(measure => {
-						if (measure.cId === item.cId) {
-							item.label = measure.label;
-							exists = true
-						}
-					})
-
-					return exists;
-				})
-			}
-
-			$scope.removeItemById = function (id) {
-				const index = $scope.state.map(item => item.cId).indexOf(id);
-				if (index > -1) {
-					$scope.state.splice(index, 1);
+			$scope.toggleMode = async function (mode) {
+				$scope.table.close();
+				$scope.mode = mode;
+				if (mode === 'table') {
+					$scope.state.column = [...$scope.state.column, ...$scope.state.row];
+					$scope.state.row = [];
 				}
-				$scope.setIsActive($scope.menuDimensions, id, false)
-				$scope.setIsActive($scope.menuMeasures, id, false)
+				$scope.table = await $scope.createTable([], []);
+				$scope.table.show("cbcr__table")
+					.then(reply => {
+						$scope.updateTable()
+					})
 			}
 
-			$scope.addToState = function (item) {
-				$scope.state.push(item);
+			$scope.removeButton = function (type, id) {
+				$scope.removeItemById(type, id);
+				$scope.updateTable();
+			}
+
+			$scope.expandAll = function () {
+				$scope.app.getObject($scope.table.id)
+					.then(table => {
+						table.expandTop("/qHyperCubeDef", 0, 0, true)
+						return table.expandLeft("/qHyperCubeDef", 0, 0, true)
+					})
+					.catch(err => {
+						console.log(err);
+					})
+			};
+
+			$scope.collapseAll = function () {
+				$scope.app.getObject($scope.table.id)
+					.then(table => {
+						table.collapseTop("/qHyperCubeDef", 0, 0, true)
+						return table.collapseLeft("/qHyperCubeDef", 0, 0, true)
+					})
+					.catch(err => {
+						console.log(err);
+					})
+			};
+
+			$scope.menuToggleActive = function (type, id) {
+				if (type === 'd') {
+					if (this.dimension.isActive) {
+						$scope.removeItemById('d', id);
+					} else {
+						$scope.addToState('column', {
+							cId: id,
+							label: this.dimension.label,
+							type: "d"
+						})
+					}
+				}
+
+				if (type === 'm') {
+					if (this.measure.isActive) {
+						$scope.removeItemById('m', id)
+					} else {
+						$scope.addToState('measure', {
+							cId: id,
+							label: this.measure.label,
+							type: "m"
+						})
+					}
+				}
+				$scope.updateTable()
+			};
+
+
+			$scope.removeItemById = function (type, id) {
+				if (type === 'd') {
+					let index = $scope.state.column.map(item => item.cId).indexOf(id);
+					if (index > -1) {
+						$scope.state.column.splice(index, 1);
+						return $scope.setIsActive($scope.menuDimensions, id, false)
+					}
+					index = $scope.state.row.map(item => item.cId).indexOf(id);
+					if (index > -1) {
+						$scope.state.row.splice(index, 1);
+						return $scope.setIsActive($scope.menuDimensions, id, false)
+					}
+				} else {
+					const index = $scope.state.measure.map(item => item.cId).indexOf(id);
+					if (index > -1) {
+						$scope.state.measure.splice(index, 1);
+					}
+					$scope.setIsActive($scope.menuMeasures, id, false)
+				}
+			}
+
+
+
+
+			// HELPER FUNCTIONS
+
+			$scope.addToState = function (location, item) {
+				$scope.state[location].push(item);
 				$scope.setIsActive($scope.menuDimensions, item.cId, true)
 				$scope.setIsActive($scope.menuMeasures, item.cId, true)
 			}
@@ -184,46 +278,14 @@ export default function (app, qlik) {
 				})
 			};
 
-			$scope.removeButton = function (id) {
-				$scope.removeItemById(id);
-				$scope.updateTable();
-			}
-
-
-			$scope.createActiveDimensions = function () {
-				let dimensionCount = 0;
-				$scope.activeDimensions = $scope.fullDimensions.filter(dimension => {
-					let exists = false;
-					$scope.state.map((stateItem, index) => {
-						if (stateItem.cId === dimension.qDef.cId) {
-							exists = true;
-							$scope.sortOrder[index] = dimensionCount;
-							dimensionCount++
-							dimension.sortIndex = index;
-						}
-					})
-					return exists;
-				})
-			}
-
-			$scope.createActiveMeasures = function () {
-				$scope.activeMeasures = $scope.fullMeasures.filter(measure => {
-					let exists = false;
-					$scope.state.map((stateItem, index) => {
-						if (stateItem.cId === measure.qDef.cId) {
-							exists = true;
-							measure.sortIndex = index;
-						}
-					})
-					return exists;
-				})
-			}
-
 			$scope.createActiveItems = function () {
 				let itemCount = 0;
 				$scope.activeDimensions = $scope.fullDimensions.filter(dimension => {
 					let exists = false;
-					$scope.state.map((stateItem, index) => {
+					[
+						...$scope.state.column,
+						...$scope.state.row
+					].map((stateItem, index) => {
 						if (stateItem.cId === dimension.qDef.cId) {
 							exists = true;
 							itemCount++
@@ -231,20 +293,19 @@ export default function (app, qlik) {
 						}
 					})
 					return exists;
-				})
+				}).sort((a, b) => a.sortIndex - b.sortIndex);
 
 				$scope.activeMeasures = $scope.fullMeasures.filter(measure => {
 					let exists = false;
-					$scope.state.map((stateItem, index) => {
+					$scope.state.measure.map((stateItem, index) => {
 						if (stateItem.cId === measure.qDef.cId) {
 							exists = true;
 							itemCount++
-							measure.sortIndex = index;
+							measure.sortIndex = $scope.activeDimensions.length + index;
 						}
 					})
 					return exists;
-				})
-
+				}).sort((a, b) => a.sortIndex - b.sortIndex)
 
 				$scope.sortOrder = new Array(itemCount);
 
@@ -254,53 +315,90 @@ export default function (app, qlik) {
 				].map((item, index) => {
 					$scope.sortOrder[item.sortIndex] = index;
 				})
-
 			}
 
 			$scope.updateTable = function () {
-				$scope.isUpdating = true;
+				// $scope.isUpdating = true;
 				$scope.createActiveItems();
 
-				const patches = [{
-					qOp: "replace",
-					qPath: "qHyperCubeDef/qDimensions",
-					qValue: JSON.stringify($scope.activeDimensions)
-				}, {
-					qOp: "replace",
-					qPath: "qHyperCubeDef/qMeasures",
-					qValue: JSON.stringify($scope.activeMeasures)
+				$scope.activeMeasures = $scope.activeMeasures
+
+				let patches;
+				if ($scope.mode === 'table') {
+					patches = [{
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qDimensions",
+						qValue: JSON.stringify($scope.activeDimensions)
+					}, {
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qMeasures",
+						qValue: JSON.stringify($scope.activeMeasures)
+					}
+						, {
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qColumnOrder",
+						qValue: JSON.stringify($scope.sortOrder)
+					}
+						, {
+						qOp: "replace",
+						qPath: "qHyperCubeDef/columnOrder",
+						qValue: JSON.stringify($scope.sortOrder)
+					},
+					{
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qInterColumnSortOrder",
+						qValue: JSON.stringify($scope.sortOrder)
+					}
+					];
+				} else {
+					patches = [{
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qDimensions",
+						qValue: JSON.stringify($scope.activeDimensions)
+					}, {
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qMeasures",
+						qValue: JSON.stringify($scope.activeMeasures)
+					}
+						, {
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qColumnOrder",
+						qValue: JSON.stringify($scope.sortOrder)
+					},
+					{
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qInterColumnSortOrder",
+						qValue: JSON.stringify($scope.sortOrder)
+					},
+					{
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qNoOfLeftDims",
+						qValue: JSON.stringify($scope.state.column.length)
+					},
+					{
+						qOp: "replace",
+						qPath: "qHyperCubeDef/qIndentMode",
+						qValue: JSON.stringify(false)
+					}
+					];
 				}
-					, {
-					qOp: "replace",
-					qPath: "qHyperCubeDef/qColumnOrder",
-					qValue: JSON.stringify($scope.sortOrder)
-				}
-					, {
-					qOp: "replace",
-					qPath: "qHyperCubeDef/columnOrder",
-					qValue: JSON.stringify($scope.sortOrder)
-				},
-				{
-					qOp: "replace",
-					qPath: "qHyperCubeDef/qInterColumnSortOrder",
-					qValue: JSON.stringify($scope.sortOrder)
-				}
-				];
+
+
 				$scope.app.getObject($scope.table.id)
 					.then(table => {
 						return table.applyPatches(patches, false);
 					})
-					.then(reply => {
-						$scope.isUpdating = false;
-					})
+					// .then(reply => {
+					// 	// $scope.isUpdating = false;
+					// })
 					.catch(err => {
-						$scope.isUpdating = false;
+						// $scope.isUpdating = false;
 						alert('Unable to refresh. Please try again.');
 					})
 			};
 
 			$scope.exportData = function () {
-				if ($scope.state.length > 0) {
+				if ($scope.state.column.length + $scope.state.row.length + $scope.state.measure.length > 0) {
 					$scope.app.getObject($scope.table.id)
 						.then(table => {
 							const data = qlik.table(table);
@@ -310,7 +408,9 @@ export default function (app, qlik) {
 			}
 
 			$scope.clearAll = function () {
-				$scope.state = [];
+				$scope.state.column = [];
+				$scope.state.row = [];
+				$scope.state.measure = [];
 				$scope.menuDimensions.map(dimension => dimension.isActive = false);
 				$scope.menuMeasures.map(measure => measure.isActive = false);
 				$scope.updateTable();
@@ -323,13 +423,21 @@ export default function (app, qlik) {
 
 					items.map(item => {
 
-						[
-							...$scope.menuDimensions,
-							...$scope.menuMeasures
-						].map(menuItem => {
+						$scope.menuDimensions.map(menuItem => {
 							if (item === menuItem.label) {
 								menuItem.isActive = true;
-								$scope.state.push({
+								$scope.state.column.push({
+									cId: menuItem.cId,
+									label: menuItem.label,
+									type: menuItem.type
+								})
+							}
+						})
+
+						$scope.menuMeasures.map(menuItem => {
+							if (item === menuItem.label) {
+								menuItem.isActive = true;
+								$scope.state.measure.push({
 									cId: menuItem.cId,
 									label: menuItem.label,
 									type: menuItem.type
@@ -343,7 +451,6 @@ export default function (app, qlik) {
 				}
 			};
 
-			// console.log('Controller end')
 		},
 	]
 } 
