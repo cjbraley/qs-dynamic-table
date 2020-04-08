@@ -1,6 +1,6 @@
 {
-	"name": "CB Custom Report",
-	"description": "Qlik table where dimensions and measures can be selected dynamically.",
+	"name": "QS Custom Report",
+	"description": "Allows users to create their own tables from a list of dimensions and measures.",
 	"type": "visualization",
 	"version": "1.0.0",
 	"icon": "extension",

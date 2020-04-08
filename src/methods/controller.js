@@ -1,6 +1,4 @@
 
-import Sortable from 'sortablejs';
-
 export default function (app, qlik) {
 	return [
 		"$scope",
