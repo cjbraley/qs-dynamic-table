@@ -39,7 +39,7 @@ In order for a variable to update, it must be included in the dimension property
 
 ![Adding your variable](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable_config_dimensions.jpg)
 
-![Update your default items](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable_config_setup.jpg)
+![Update your default items](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable_config_Setup.jpg)
 
 # License
 MIT
