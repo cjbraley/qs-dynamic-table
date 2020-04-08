@@ -5,7 +5,7 @@ Qlik Sense extension that allows users to create their own tables from a list of
 
 # Installation
 
-Download [dist/qs-custom-report.zip](https://github.com/cjbraley/qs-custom-report/raw/master/dist/qs-custom-report.zip), upload to Qlik server or extract to appropriate folder.
+Download [dist/qs-custom-report.zip](https://github.com/cjbraley/qs-custom-report/raw/master/dist/CB%20Custom%20Report.zip), upload to Qlik server or extract to appropriate folder.
 
 Qlik Sense Desktop: unzip to a directory under Documents/Qlik/Sense/Extensions.
 
