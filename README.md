@@ -33,13 +33,13 @@ Setup instructions:
 
 QS Custom Report supports the use of variables in your dimension and measure names.
 
-![Using a variable](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable.jpg)
+![Using a variable](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable.gif)
 
 In order for a variable to update, it must be included in the dimension property. This is required for Qlik Sense to know that the QS Custom Report object depends on the variable in question.
 
-![Adding your variable](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable_config_dimensions.gif)
+![Adding your variable](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable_config_dimensions.jpg)
 
-![Update your default items](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable_config_setup.gif)
+![Update your default items](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo_variable_config_setup.jpg)
 
 # License
 MIT
