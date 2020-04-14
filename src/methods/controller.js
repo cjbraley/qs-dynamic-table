@@ -27,6 +27,7 @@ export default function (app, qlik) {
 			$('#cbcr__column, #cbcr__row').sortable({
 				connectWith: ".connected-sortable",
 				opacity: 0.6,
+				delay: 150,
 				start: function (event, ui) {
 					$scope.sortOriginIndex = ui.item.index();
 					$scope.sortOriginList = event.target.id.split('__')[1];
@@ -45,6 +46,7 @@ export default function (app, qlik) {
 
 			$('#cbcr__measure').sortable({
 				opacity: 0.6,
+				delay: 150,
 				start: function(event, ui){
 					$scope.sortOriginIndex = ui.item.index();
 				},
