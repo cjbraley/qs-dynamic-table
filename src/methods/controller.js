@@ -269,7 +269,7 @@ export default function (app, qlik) {
 
 			$scope.addToState = function (location, item) {
 				$scope.addedToIndex = $scope.state[location].push(item) - 1;
-				if(location == 'measure') $scope.addedToIndex += $scope.state.column.length;
+				if (location == 'measure') $scope.addedToIndex += $scope.state.column.length;
 				$scope.setIsActive($scope.menuDimensions, item.cId, true)
 				$scope.setIsActive($scope.menuMeasures, item.cId, true)
 			}
@@ -321,25 +321,28 @@ export default function (app, qlik) {
 				})
 			}
 
-			$scope.setInterColumnSortOrder = function(){
-
-				let qInterColumnSortOrder = $scope.table.table.qHyperCube.qEffectiveInterColumnSortOrder;
-				if(qInterColumnSortOrder.length > $scope.sortOrder.length && $scope.removedColumnTableIndex > -1){
-					qInterColumnSortOrder = qInterColumnSortOrder.filter(columnIndex => columnIndex != $scope.removedColumnTableIndex);
-					qInterColumnSortOrder = qInterColumnSortOrder.map(columnIndex => columnIndex >= $scope.removedColumnTableIndex ? columnIndex - 1 : columnIndex);
-				}else if(qInterColumnSortOrder.length < $scope.sortOrder.length)
-				{
-					qInterColumnSortOrder = qInterColumnSortOrder.map(columnIndex => columnIndex >= $scope.addedToIndex ? columnIndex + 1 : columnIndex);
+			$scope.setInterColumnSortOrder = function (manualOrder = null) {
+				let qInterColumnSortOrder
+				if (manualOrder) {
+					qInterColumnSortOrder = manualOrder;
+				} else {
+					qInterColumnSortOrder = $scope.table.table.qHyperCube.qEffectiveInterColumnSortOrder;
+					if (qInterColumnSortOrder.length > $scope.sortOrder.length && $scope.removedColumnTableIndex > -1) {
+						qInterColumnSortOrder = qInterColumnSortOrder.filter(columnIndex => columnIndex != $scope.removedColumnTableIndex);
+						qInterColumnSortOrder = qInterColumnSortOrder.map(columnIndex => columnIndex >= $scope.removedColumnTableIndex ? columnIndex - 1 : columnIndex);
+					} else if (qInterColumnSortOrder.length < $scope.sortOrder.length) {
+						qInterColumnSortOrder = qInterColumnSortOrder.map(columnIndex => columnIndex >= $scope.addedToIndex ? columnIndex + 1 : columnIndex);
+					}
 				}
 				$scope.qInterColumnSortOrder = qInterColumnSortOrder;
 				$scope.removedColumnTableIndex = -1;
 			}
 
-			$scope.updateTable = function () {
+			$scope.updateTable = function (setInterColumnSortOrder = true) {
 				// $scope.isUpdating = true;
 				$scope.createActiveItems();
 
-				$scope.setInterColumnSortOrder();
+				if(setInterColumnSortOrder) $scope.setInterColumnSortOrder();
 
 				let patches;
 				if ($scope.mode === 'table') {
@@ -439,6 +442,7 @@ export default function (app, qlik) {
 				if ($scope.props.defaultItems) {
 					$scope.clearAll();
 					const items = $scope.props.defaultItems.split(',');
+					$scope.setInterColumnSortOrder(Array.from(Array(items.length).keys()));
 
 					items.map(item => {
 
@@ -466,7 +470,7 @@ export default function (app, qlik) {
 					})
 
 
-					$scope.updateTable();
+					$scope.updateTable(false);
 				}
 			};
 
