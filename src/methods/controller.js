@@ -268,7 +268,8 @@ export default function (app, qlik) {
 			// HELPER FUNCTIONS
 
 			$scope.addToState = function (location, item) {
-				$scope.state[location].push(item);
+				$scope.addedToIndex = $scope.state[location].push(item) - 1;
+				if(location == 'measure') $scope.addedToIndex += $scope.state.column.length;
 				$scope.setIsActive($scope.menuDimensions, item.cId, true)
 				$scope.setIsActive($scope.menuMeasures, item.cId, true)
 			}
@@ -325,7 +326,10 @@ export default function (app, qlik) {
 				let qInterColumnSortOrder = $scope.table.table.qHyperCube.qEffectiveInterColumnSortOrder;
 				if(qInterColumnSortOrder.length > $scope.sortOrder.length && $scope.removedColumnTableIndex > -1){
 					qInterColumnSortOrder = qInterColumnSortOrder.filter(columnIndex => columnIndex != $scope.removedColumnTableIndex);
-					qInterColumnSortOrder = qInterColumnSortOrder.map(columnIndex => columnIndex >= $scope.removedColumnTableIndex ? columnIndex -1 : columnIndex);
+					qInterColumnSortOrder = qInterColumnSortOrder.map(columnIndex => columnIndex >= $scope.removedColumnTableIndex ? columnIndex - 1 : columnIndex);
+				}else if(qInterColumnSortOrder.length < $scope.sortOrder.length)
+				{
+					qInterColumnSortOrder = qInterColumnSortOrder.map(columnIndex => columnIndex >= $scope.addedToIndex ? columnIndex + 1 : columnIndex);
 				}
 				$scope.qInterColumnSortOrder = qInterColumnSortOrder;
 				$scope.removedColumnTableIndex = -1;

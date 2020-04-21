@@ -21,6 +21,7 @@ export default async function ($element, layout, self, qlik, $) {
 					qDef: dimension.qDef,
 					qCalcCondition: dimension.qCalcCondition,
 					qShowTotal: dimension.qShowTotal,
+					qAttributeExpressions: dimension.qAttributeExpressions,
 					qShowAll: dimension.qShowAll,
 					qOtherTotalSpec: dimension.qOtherTotalSpec,
 					qNullSuppression: dimension.qNullSuppression,
@@ -35,6 +36,7 @@ export default async function ($element, layout, self, qlik, $) {
 					qDef: measure.qDef,
 					qCalcCondition: measure.qCalcCondition,
 					qSortBy: measure.qSortBy,
+					qAttributeExpressions: measure.qAttributeExpressions,
 					label: measure.qLabel ? measure.qDef.qLabel : measure.qDef.qDef
 				}
 			})

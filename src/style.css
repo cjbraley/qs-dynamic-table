@@ -149,7 +149,7 @@
     font-size: 0.725rem !important;
     margin: 0 0.0375rem;
     color: #ededed;
-    transition: color 0.1s linear;
+    transition: color 1s linear;
 }
 
 .cbcr__config__item i:hover {
