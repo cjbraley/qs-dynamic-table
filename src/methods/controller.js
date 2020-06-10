@@ -470,7 +470,7 @@ export default function (app, qlik) {
 					})
 
 
-					$scope.updateTable(false);
+					$scope.updateTable(true);
 				}
 			};
 
