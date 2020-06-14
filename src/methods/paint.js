@@ -5,7 +5,17 @@ export default async function ($element, layout, self, qlik, $) {
 	// Init
 	/////////////////
 	const tableId = layout.props.tableId;
-	self.$scope.props.defaultItems = layout.props.defaultItems;
+
+	if(layout.props.presetStates.length > 0){
+		self.$scope.props.presetStates = layout.props.presetStates;
+	}else{
+		self.$scope.props.presetStates = [{ name: 'No preset states'}];
+	}
+
+	if(!self.$scope.selectedState) {
+		self.$scope.selectedState = self.$scope.props.presetStates[0];
+	}
+
 	self.$scope.props.title = layout.props.title;
 
 
@@ -84,7 +94,6 @@ export default async function ($element, layout, self, qlik, $) {
 		)
 	})
 
-
 	self.$scope.updateStateItems();
 	self.$scope.updateMenuState();
 
@@ -92,14 +101,7 @@ export default async function ($element, layout, self, qlik, $) {
 	// render table
 
 	if(!self.$scope.table){
-		// console.log("render table")
-		// this need to use activeDimensions
-		self.$scope.table = await self.$scope.createTable([],[]);
-		self.$scope.isLoading = false;
-		self.$scope.table.show("cbcr__table")
-			.then(reply => {
-				self.$scope.applyDefaultState()
-			})
+		self.$scope.retrieveStateFromLocalStorage()
 	}
 
 	return qlik.Promise.resolve();

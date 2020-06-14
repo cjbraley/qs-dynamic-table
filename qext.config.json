@@ -1,10 +1,10 @@
 {
-  "extension": "CB Custom Report",
+  "extension": "QS Custom Report",
   "mode": "compile",
   "output": "./dist",
   "compile": {
     "entry": "./src/index.js",
-    "qext": "./src/index.qext",
+    "qext": "./src/qext.json",
     "static": "./static"
   },
   "deploy": "desktop",

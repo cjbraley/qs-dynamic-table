@@ -1,68 +1,105 @@
 <div class="cbcr__chart-container">
-    <div class="cbcr__mode">
-        <button class="cbcr__button" style="width: 48.5%;" ng-class="{'cbcr__active': mode === 'table'}" ng-click="toggleMode('table')">Straight Table</button>
-        <button class="cbcr__button" style="width: 48.5%;" ng-class="{'cbcr__active': mode === 'pivot-table'}"ng-click="toggleMode('pivot-table')">Pivot Table</button>
-    </div>
-    <div class="cbcr__items-menu">
-        <div class="cbcr__items-menu__dimensions">
-            <div class="cbcr__title">Dimensions:</div>
-            <ul class="cbcr__items-menu__list">
-                <li ng-repeat="dimension in menuDimensions track by dimension.cId" ng-click="menuToggleActive('d',dimension.cId)" ng-class="{'cbcr__active': dimension.isActive}" class="cbcr__items-menu__list-item">
-                    <span>{{dimension.label}}</span> 
-                    <div class="lui-icon lui-icon--tick" ng-if="dimension.isActive"></div>
-                </li>
-            </ul>
+    <div class="cbcr__options">
+        <div class="cbcr__mode">
+            <button 
+                class="cbcr__button" 
+                style="width: 48.5%; margin-right: 3%" 
+                ng-class="{'cbcr__active': state.mode === 'table'}"
+                ng-click="toggleMode('table')"
+            >Straight Table</button>
+            <button class="cbcr__button" style="width: 48.5%;" ng-class="{'cbcr__active': state.mode === 'pivot-table'}"
+                ng-click="toggleMode('pivot-table')">Pivot Table</button>
         </div>
-        <div class="cbcr__items-menu__measures">
-            <div class="cbcr__title">Measures:</div>
-            <ul class="cbcr__items-menu__list">
-                <li ng-repeat="measure in menuMeasures track by measure.cId" ng-click="menuToggleActive('m',measure.cId)" ng-class="{'cbcr__active': measure.isActive}" class="cbcr__items-menu__list-item">
-                    <span>{{measure.label}}</span> 
-                    <div class="lui-icon lui-icon--tick" ng-if="measure.isActive"></div>
-                </li>
-            </ul>
+        
+        <select 
+            class="cbcr__dropdown"
+            id="selectedState" 
+            ng-model="selectedState"
+            ng-change="createSelectedState()"
+            ng-options="state as state.name for state in props.presetStates">
+        </select>
+
+        <div class="cbcr__items-menu">
+            <div class="cbcr__items-menu__dimensions">
+                <div class="cbcr__title">Dimensions:</div>
+                <ul class="cbcr__items-menu__list">
+                    <li ng-repeat="dimension in menuDimensions track by $index"
+                        ng-click="menuToggleActive('d',dimension.cId)" ng-class="{'cbcr__active': dimension.isActive}"
+                        class="cbcr__items-menu__list-item">
+                        <span>{{dimension.label}}</span>
+                        <div class="lui-icon lui-icon--tick" ng-if="dimension.isActive"></div>
+                    </li>
+                </ul>
+            </div>
+            <div class="cbcr__items-menu__measures">
+                <div class="cbcr__title">Measures:</div>
+                <ul class="cbcr__items-menu__list">
+                    <li ng-repeat="measure in menuMeasures track by $index" ng-click="menuToggleActive('m',measure.cId)"
+                        ng-class="{'cbcr__active': measure.isActive}" class="cbcr__items-menu__list-item">
+                        <span>{{measure.label}}</span>
+                        <div class="lui-icon lui-icon--tick" ng-if="measure.isActive"></div>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
     <div class="cbcr__buttons">
         <div class="cbcr__title">{{ props.title }}</div>
-        <i title="Apply default state" class="lui-icon lui-icon--bookmark" ng-click="applyDefaultState()"></i>
+        <i title="Apply selected state" class="lui-icon lui-icon--bookmark" ng-click="createSelectedState()"></i>
         <i title="Clear All" class="lui-icon lui-icon--clear-selections" ng-click="clearAll()"></i>
         <i title="Export" class="lui-icon lui-icon--export" ng-click="exportData()"></i>
-        <button ng-if="mode === 'pivot-table'" class="cbcr__button" style="margin-left: 0.75rem;" ng-click="expandAll()">Expand All</button>
-        <button ng-if="mode === 'pivot-table'" class="cbcr__button" ng-click="collapseAll()">Collapse All</button>
+        <button 
+            ng-if="state.mode === 'pivot-table'" 
+            class="cbcr__button" 
+            style="margin: 0 0.5rem;"
+            ng-click="expandAll()"
+        >Expand All</button>
+        <button 
+            ng-if="state.mode === 'pivot-table'" 
+            class="cbcr__button" 
+            ng-click="collapseAll()"
+        >Collapse All</button>
     </div>
     <div class="cbcr__config">
 
         <div class="cbcr_config__row">
-            <span class="cbcr__config__title">Columns:</span> 
+            <span class="cbcr__config__title">Columns:</span>
             <ul class="cbcr__config__list connected-sortable" id="cbcr__column">
-                <li ng-repeat="item in state.column" class="cbcr__config__item" ng-class="{'cbcr__config__item--dimension': item.type === 'd', 'cbcr__config__item--measure': item.type === 'm'}">
+                <li ng-repeat="item in state.column track by item.cId" class="cbcr__config__item"
+                    ng-class="{'cbcr__config__item--dimension': item.type === 'd', 'cbcr__config__item--measure': item.type === 'm'}">
                     <span>{{ item.label }}</span>
+                    <i ng-if="state.mode === 'pivot-table'" class="lui-icon lui-icon--swap"
+                        ng-click="swapDimension('column',item)"></i>
                     <i class="lui-icon lui-icon--remove" ng-click="removeButton('d',item.cId)"></i>
                 </li>
             </ul>
         </div>
 
-        <div class="cbcr_config__row" ng-show="mode === 'pivot-table'">
-            <span class="cbcr__config__title">Rows:</span> 
+        <div class="cbcr_config__row" ng-show="state.mode === 'pivot-table'">
+            <span class="cbcr__config__title">Rows:</span>
             <ul class="cbcr__config__list connected-sortable" id="cbcr__row">
-                <li ng-repeat="item in state.row" class="cbcr__config__item cbcr__config__item--dimension">
+                <li ng-repeat="item in state.row track by item.cId"
+                    class="cbcr__config__item cbcr__config__item--dimension">
                     <span>{{ item.label }}</span>
+                    <i ng-if="state.mode === 'pivot-table'" class="lui-icon lui-icon--swap"
+                        ng-click="swapDimension('row',item)"></i>
                     <i class="lui-icon lui-icon--remove" ng-click="removeButton('d',item.cId)"></i>
                 </li>
             </ul>
         </div>
 
         <div class="cbcr_config__row">
-            <span class="cbcr__config__title">Measures:</span> 
+            <span class="cbcr__config__title">Measures:</span>
             <ul class="cbcr__config__list" id="cbcr__measure">
-                <li ng-repeat="item in state.measure" class="cbcr__config__item cbcr__config__item--measure">
+                <li ng-repeat="item in state.measure track by item.cId"
+                    class="cbcr__config__item cbcr__config__item--measure">
                     <span>{{ item.label }}</span>
                     <i class="lui-icon lui-icon--remove" ng-click="removeButton('m',item.cId)"></i>
                 </li>
             </ul>
         </div>
     </div>
+
     <div class="cbcr__table" id="cbcr__table"></div>
     <div class="cbcr__loader" ng-if="isLoading"></div>
 </div>

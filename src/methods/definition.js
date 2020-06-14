@@ -21,13 +21,6 @@ export default function (tableList) {
 						defaultValue: "",
 						ref: "props.tableId"
 					},
-					defaultItems: {
-						label: "Default items (comma separated)",
-						type: "string",
-						expression: "optional",
-						defaultValue: "",
-						ref: "props.defaultItems"
-					},
 					title: {
 						label: "Title",
 						type: "string",
@@ -35,6 +28,35 @@ export default function (tableList) {
 						ref: "props.title",
 						defaultValue: ""
 					}
+				}
+			},
+			states: {
+				label: 'Preset states',
+				type: 'items',
+				items: {
+					options: {
+						type: 'array',
+						ref: 'props.presetStates',
+						label: 'Preset states',
+						itemTitleRef: 'name',
+						allowAdd: true,
+						allowRemove: true,
+						addTranslation: 'Add preset',
+						items: {
+							name: {
+								type: 'string',
+								ref: 'name',
+								label: 'Name',
+								expression: 'optional'
+							},
+							value: {
+								type: 'string',
+								ref: 'state',
+								label: 'State',
+								expression: 'optional'
+							}
+						}
+					},
 				}
 			},
 			addons: {

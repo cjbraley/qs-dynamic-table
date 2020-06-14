@@ -6,16 +6,28 @@
     grid-template-rows: 1.5rem auto 1fr;
     grid-gap: 0.25rem 0.125rem;
     grid-template-areas: 
-        "mode buttons"
-        "menu config"
-        "menu table"
+        "options buttons"
+        "options config"
+        "options table"
     ;
 }
 
+.cbcr__options {
+    grid-area: options;
+    display: flex;
+    flex-direction: column;
+}
+
+.cbcr__dropdown {
+    margin-bottom: 0.5rem;
+    border-radius: 3px;
+    text-overflow: ellipsis;
+}
+
 .cbcr__mode {
-    grid-area: mode;
     display: flex;
     justify-content: space-between;
+    margin-bottom: 0.5rem;
 }
 
 .cbcr__buttons {
@@ -36,7 +48,6 @@
 
 
 .cbcr__items-menu {
-    margin-top: 0.5rem;
     grid-area: menu;
     display: flex;
     flex-direction: column;
@@ -82,7 +93,7 @@
 
 .cbcr__items-menu__list-item .lui-icon {
     font-size: 0.75rem !important;
-    margin: auto 0;
+    margin: auto 0 auto 0.25rem;
 }
 
 
@@ -140,21 +151,21 @@
 }
 
 .cbcr__config__item span {
-    margin-right: 0.25rem;
+    /* margin-right: 0.25rem; */
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
 .cbcr__config__item i {
     font-size: 0.725rem !important;
-    margin: 0 0.0375rem;
+    margin: 0 0 0 0.30rem;
     color: #ededed;
     transition: color 1s linear;
 }
 
 .cbcr__config__item i:hover {
     font-size: 0.8rem !important;
-    margin: 0;
+    margin: 0 0 0 0.215rem;
     color: #fff;
 }
 
@@ -179,7 +190,6 @@
     color: #595959;
     height: 1.5rem;
     padding: 2px 5px;
-    margin-left: 0.25rem;
     border: 1px solid #b3b3b3
 }
 
