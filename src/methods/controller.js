@@ -444,9 +444,10 @@ export default function (app, qlik) {
 			}
 
 			$scope.retrieveStateFromLocalStorage = async function(){
+				$scope.retrievedSortOrder = [];
 				const retrievedState = JSON.parse(localStorage.getItem($scope.localStorageKey));
-				$scope.retrievedSortOrder = retrievedState.qInterColumnSortOrder;
 				if(retrievedState){
+					$scope.retrievedSortOrder = retrievedState.qInterColumnSortOrder;
 					$scope.state = retrievedState;
 					$scope.table = await $scope.createTable([], []);
 					$scope.isLoading = false;
@@ -456,7 +457,12 @@ export default function (app, qlik) {
 						})
 					
 				}else{
-					$scope.createSelectedState();
+					$scope.table = await $scope.createTable([], []);
+					$scope.isLoading = false;
+					$scope.table.show("cbcr__table")
+						.then(reply => {
+						$scope.createSelectedState();
+						})
 				}
 			}
 
