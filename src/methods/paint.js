@@ -9,7 +9,7 @@ export default async function ($element, layout, self, qlik, $) {
 	if(layout.props.presetStates.length > 0){
 		self.$scope.props.presetStates = layout.props.presetStates;
 	}else{
-		self.$scope.props.presetStates = [{ name: 'No preset states'}];
+		self.$scope.props.presetStates = [{ name: 'No preset states', state: "", cId: "xyz"}];
 	}
 
 	if(!self.$scope.selectedState) {
@@ -101,6 +101,7 @@ export default async function ($element, layout, self, qlik, $) {
 	// render table
 
 	if(!self.$scope.table){
+		console.log('ran')
 		self.$scope.retrieveStateFromLocalStorage()
 	}
 

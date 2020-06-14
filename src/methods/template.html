@@ -16,7 +16,7 @@
             id="selectedState" 
             ng-model="selectedState"
             ng-change="createSelectedState()"
-            ng-options="state as state.name for state in props.presetStates">
+            ng-options="state as state.name for state in props.presetStates track by state.cId">
         </select>
 
         <div class="cbcr__items-menu">
