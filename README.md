@@ -15,7 +15,7 @@ Qlik Sense Server: import the zip file in the QMC.
 
 ## Getting Started
 
-Download the [demo application.](https://github.com/cjbraley/qs-custom-report/raw/master/demo/qs-custom-report.qvf).
+Download the [demo application](https://github.com/cjbraley/qs-custom-report/raw/master/demo/qs-custom-report.qvf).
 
 ## Getting Started
 
