@@ -15,6 +15,10 @@ Qlik Sense Server: import the zip file in the QMC.
 
 ## Getting Started
 
+Download the [demo application.](https://github.com/cjbraley/qs-custom-report/raw/master/demo/demo_config.jpg).
+
+## Getting Started
+
 QS Custom Report allows the user to create their own tables. Included features are show in the gif below.
 
 ![List](https://github.com/cjbraley/qs-custom-report/blob/master/demo/demo.gif)
