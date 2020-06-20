@@ -12,12 +12,13 @@ export default async function ($element, layout, self, qlik, $) {
 		self.$scope.props.presetStates = [{ name: 'No preset states', state: "", cId: "xyz"}];
 	}
 
-	if(!self.$scope.selectedState) {
-		self.$scope.selectedState = self.$scope.props.presetStates[0];
+	if(!self.$scope.state.selectedState) {
+		self.$scope.state.selectedState = self.$scope.props.presetStates[0];
 	}
 
-	self.$scope.props.title = layout.props.title;
 
+	self.$scope.props.title = layout.props.title;
+	self.$scope.props.showCopyToClipboard = layout.props.showCopyToClipboard;
 
 	const state = self.$scope.state;
 	const hypercube = layout.qHyperCube;
@@ -100,9 +101,14 @@ export default async function ($element, layout, self, qlik, $) {
 
 	// render table
 
-	if(!self.$scope.table){
-		console.log('ran')
+	if(!self.$element.hasInitialised){
+		self.$element.hasInitialised = true;
 		self.$scope.retrieveStateFromLocalStorage()
+	}
+	else if(!self.$scope.table){
+		self.$scope.createTable(self.$scope.createSelectedState);
+	}else{
+		self.$scope.saveStateToLocalStorage()
 	}
 
 	return qlik.Promise.resolve();

@@ -27,6 +27,20 @@ export default function (tableList) {
 						expression: 'optional',
 						ref: "props.title",
 						defaultValue: ""
+					},
+					showCopyToClipBoard: {
+						type: "boolean",
+						component: "switch",
+						label: "Show copy to clipboard",
+						ref: "props.showCopyToClipboard",
+						options: [{
+							value: true,
+							label: "Yes"
+						}, {
+							value: false,
+							label: "No"
+						}],
+						defaultValue: true
 					}
 				}
 			},
@@ -39,6 +53,7 @@ export default function (tableList) {
 						ref: 'props.presetStates',
 						label: 'Preset states',
 						itemTitleRef: 'name',
+						allowMove: true,
 						allowAdd: true,
 						allowRemove: true,
 						addTranslation: 'Add preset',

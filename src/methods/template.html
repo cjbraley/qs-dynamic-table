@@ -14,9 +14,9 @@
         <select 
             class="cbcr__dropdown"
             id="selectedState" 
-            ng-model="selectedState"
+            ng-model="state.selectedState"
             ng-change="createSelectedState()"
-            ng-options="state as state.name for state in props.presetStates track by state.cId">
+            ng-options="state as state.name for state in props.presetStates track by state.state">
         </select>
 
         <div class="cbcr__items-menu">
@@ -46,8 +46,9 @@
     <div class="cbcr__buttons">
         <div class="cbcr__title">{{ props.title }}</div>
         <i title="Apply selected state" class="lui-icon lui-icon--bookmark" ng-click="createSelectedState()"></i>
-        <i title="Clear All" class="lui-icon lui-icon--clear-selections" ng-click="clearAll()"></i>
+        <i title="Clear All" class="lui-icon lui-icon--clear-selections" ng-click="clearAll(true)"></i>
         <i title="Export" class="lui-icon lui-icon--export" ng-click="exportData()"></i>
+        <i title="Copy current state to clipboard" ng-if="props.showCopyToClipboard"  class="lui-icon lui-icon--edit" ng-click="copyStateToClipboard()"></i>
         <button 
             ng-if="state.mode === 'pivot-table'" 
             class="cbcr__button" 

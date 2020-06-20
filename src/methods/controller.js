@@ -22,7 +22,8 @@ export default function (app, qlik) {
 			$scope.menuMeasures = []
 			$scope.activeDimensions = [];
 			$scope.activeMeasures = [];
-						
+			$scope.retrievedSortOrder = [];
+
 			$('#cbcr__column, #cbcr__row, #cbcr__measure').sortable({
 				// connectWith: ".connected-sortable",
 				opacity: 0.6,
@@ -85,15 +86,6 @@ export default function (app, qlik) {
 					})
 					i++
 				}
-			};
-
-			$scope.createTable = async function (dimensions, measures) {
-				return $scope.app.visualization.create($scope.state.mode,
-					[
-						...dimensions,
-						...measures,
-					],
-				)
 			};
 
 			$scope.updateStateItems = function () {
@@ -161,11 +153,7 @@ export default function (app, qlik) {
 					$scope.state.column = [...$scope.state.column, ...$scope.state.row];
 					$scope.state.row = [];
 				}
-				$scope.table = await $scope.createTable([], []);
-				$scope.table.show("cbcr__table")
-					.then(reply => {
-						$scope.updateTable()
-					})
+				$scope.createTable($scope.updateTable);
 			}
 
 			$scope.removeButton = function (type, id) {
@@ -176,7 +164,7 @@ export default function (app, qlik) {
 			$scope.swapDimension = function (fromType, item) {
 				const toType = fromType === 'row' ? 'column' : 'row';
 				$scope.state[fromType].map((stateItem, i) => {
-					if(stateItem.cId === item.cId) $scope.state[fromType].splice(i, 1);
+					if (stateItem.cId === item.cId) $scope.state[fromType].splice(i, 1);
 				})
 				$scope.state[toType].push(item);
 				$scope.updateTable();
@@ -317,7 +305,7 @@ export default function (app, qlik) {
 
 			$scope.setInterColumnSortOrder = function (manualOrder = null) {
 				let qInterColumnSortOrder;
-				if($scope.retrievedSortOrder.length > 0){
+				if ($scope.retrievedSortOrder.length > 0) {
 					qInterColumnSortOrder = $scope.retrievedSortOrder;
 					$scope.retrievedSortOrder = [];
 				}
@@ -429,102 +417,130 @@ export default function (app, qlik) {
 				}
 			}
 
-			$scope.clearAll = function () {
+			$scope.clearAll = function (updateTable = false) {
 				$scope.state.column = [];
 				$scope.state.row = [];
 				$scope.state.measure = [];
 				$scope.menuDimensions.map(dimension => dimension.isActive = false);
 				$scope.menuMeasures.map(measure => measure.isActive = false);
-				$scope.updateTable();
+				if(updateTable) {
+					$scope.updateTable();
+				}
 			};
 
-			$scope.saveStateToLocalStorage = function(){
+			$scope.copyStateToClipboard = function () {
+
+				const stateLabelsArray = [
+					...$scope.state.column,
+					...$scope.state.row,
+					...$scope.state.measure,
+				]
+				.map(item => item.label);
+
+				const stateText = stateLabelsArray.filter((item, i) => stateLabelsArray.indexOf(item) === i).join(',');
+				
+				navigator.clipboard.writeText(stateText)
+					.catch(err => {
+						console.error('Async: Could not copy text: ', err);
+					});
+			}
+
+			$scope.saveStateToLocalStorage = function () {
 				const stateJSON = JSON.stringify($scope.state);
 				localStorage.setItem($scope.localStorageKey, stateJSON)
 			}
 
-			$scope.retrieveStateFromLocalStorage = async function(){
+			// $scope.createTable = async function (dimensions, measures) {
+			// 	return $scope.app.visualization.create($scope.state.mode,
+			// 		[
+			// 			...dimensions,
+			// 			...measures,
+			// 		],
+			// 	)
+			// };
+
+			$scope.createTable = async function(nextCall){
+				$scope.table = await $scope.app.visualization.create($scope.state.mode,[]);
+				$scope.isLoading = false;
+				$scope.table.show("cbcr__table")
+					.then(reply => {
+						nextCall()
+					})
+			}
+
+			$scope.retrieveStateFromLocalStorage = async function () {
 				$scope.retrievedSortOrder = [];
 				const retrievedState = JSON.parse(localStorage.getItem($scope.localStorageKey));
-				if(retrievedState){
+				if (retrievedState) {
 					$scope.retrievedSortOrder = retrievedState.qInterColumnSortOrder;
 					$scope.state = retrievedState;
-					$scope.table = await $scope.createTable([], []);
-					$scope.isLoading = false;
-					$scope.table.show("cbcr__table")
-						.then(reply => {
-							$scope.applyState()
-						})
-					
-				}else{
-					$scope.table = await $scope.createTable([], []);
-					$scope.isLoading = false;
-					$scope.table.show("cbcr__table")
-						.then(reply => {
-						$scope.createSelectedState();
-						})
+					$scope.createTable($scope.applyState);
+				} else {
+					$scope.createTable($scope.createSelectedState);
 				}
 			}
 
-			$scope
-
-			$scope.createSelectedState = function(){
+			$scope.createSelectedState = function () {
 				$scope.clearAll();
 
-				if($scope.selectedState){
+				setTimeout(() => {
+					if ($scope.state.selectedState) {
 
-					const items = $scope.selectedState.state.split(',');
-
-					items.map(item => {
-						$scope.menuDimensions.map(menuItem => {
-							if (item === menuItem.label) {
-								$scope.state.column.push({
-									cId: menuItem.cId,
-									label: menuItem.label,
-									type: menuItem.type
-								})
-							}
+						const items = $scope.state.selectedState.state.split(',');
+	
+						items.map(item => {
+							$scope.menuDimensions.map(menuItem => {
+								if (item === menuItem.label) {
+									$scope.state.column.push({
+										cId: menuItem.cId,
+										label: menuItem.label,
+										type: menuItem.type
+									})
+								}
+							})
+	
+							$scope.menuMeasures.map(menuItem => {
+								if (item === menuItem.label) {
+									$scope.state.measure.push({
+										cId: menuItem.cId,
+										label: menuItem.label,
+										type: menuItem.type
+									})
+								}
+							})
 						})
+	
+						$scope.applyState(Array.from(Array(items.length).keys()));
+					}
+				},200)
 
-						$scope.menuMeasures.map(menuItem => {
-							if (item === menuItem.label) {
-								$scope.state.measure.push({
-									cId: menuItem.cId,
-									label: menuItem.label,
-									type: menuItem.type
-								})
-							}
-						})
-					})
 
-					$scope.applyState(Array.from(Array(items.length).keys()));
-				}
 			}
 
-			$scope.applyState = function(manualSortOrder) {
+			$scope.applyState = function (manualSortOrder) {
 
-					$scope.menuDimensions.map(menuItem => {
-						$scope.state.column.map(stateItem => {
-							if (stateItem.cId === menuItem.cId) {
-								menuItem.isActive = true;
-							}
-						})
-						$scope.state.row.map(stateItem => {
-							if (stateItem.cId === menuItem.cId) {
-								menuItem.isActive = true;
-							}
-						})
+				$scope.menuDimensions.map(menuItem => {
+					$scope.state.column.map(stateItem => {
+						if (stateItem.cId === menuItem.cId) {
+							menuItem.isActive = true;
+						}
 					})
-
-					$scope.menuMeasures.map(menuItem => {
-						$scope.state.measure.map(stateItem => {
-							if (stateItem.cId === menuItem.cId) {
-								menuItem.isActive = true;
-							}
-						})
+					$scope.state.row.map(stateItem => {
+						if (stateItem.cId === menuItem.cId) {
+							menuItem.isActive = true;
+						}
 					})
+				})
 
-					$scope.updateTable(manualSortOrder);
+				$scope.menuMeasures.map(menuItem => {
+					$scope.state.measure.map(stateItem => {
+						if (stateItem.cId === menuItem.cId) {
+							menuItem.isActive = true;
+						}
+					})
+				})
+
+				$scope.updateTable(manualSortOrder);
 			};
 
 		},
