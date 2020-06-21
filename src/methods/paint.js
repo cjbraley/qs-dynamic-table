@@ -23,7 +23,6 @@ export default async function ($element, layout, self, qlik, $) {
 	const state = self.$scope.state;
 	const hypercube = layout.qHyperCube;
 
-
 	await self.$scope.app.getObjectProperties(tableId)
 		.then(reply => {
 			self.$scope.fullDimensions = reply.properties.qHyperCubeDef.qDimensions.map(dimension => {

@@ -472,12 +472,19 @@ export default function (app, qlik) {
 				$scope.retrievedSortOrder = [];
 				const retrievedState = JSON.parse(localStorage.getItem($scope.localStorageKey));
 				if (retrievedState) {
-					$scope.retrievedSortOrder = retrievedState.qInterColumnSortOrder;
-					$scope.state = retrievedState;
-					$scope.createTable($scope.applyState);
-				} else {
-					$scope.createTable($scope.createSelectedState);
+					// If the retrieved state does not exists in the currently available presets, then do the base case
+					const retrievedStateName = retrievedState.selectedState.name;
+					const retrievedPresetIsAvailable = $scope.props.presetStates.reduce((acc,el) => acc || el.name === retrievedStateName, false);
+					if(retrievedPresetIsAvailable){
+						$scope.retrievedSortOrder = retrievedState.qInterColumnSortOrder;
+						$scope.state = retrievedState;
+						$scope.createTable($scope.applyState);
+						return;
+					}
+					//
+
 				}
+				$scope.createTable($scope.createSelectedState);
 			}
 
 			$scope.createSelectedState = function () {
