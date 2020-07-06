@@ -45,7 +45,7 @@ export default function (tableList) {
 					evaluateVariables: {
 						type: "boolean",
 						component: "switch",
-						label: "Evaluate variables in fields",
+						label: "Dynamic menu items",
 						ref: "props.evaluateVariables",
 						options: [{
 							value: true,
