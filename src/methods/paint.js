@@ -19,6 +19,7 @@ export default async function ($element, layout, self, qlik, $) {
 
 
 	self.$scope.props.title = layout.props.title;
+	self.$scope.props.evaluateVariables = layout.props.evaluateVariables === undefined ? true : layout.props.evaluateVariables;
 	self.$scope.props.showCopyToClipboard = layout.props.showCopyToClipboard;
 
 	const state = self.$scope.state;
@@ -49,52 +50,73 @@ export default async function ($element, layout, self, qlik, $) {
 					qCalcCondition: measure.qCalcCondition,
 					qSortBy: measure.qSortBy,
 					qAttributeExpressions: measure.qAttributeExpressions,
-					label: measure.qLabel ? measure.qDef.qLabel : measure.qDef.qDef
+					label: measure.qDef.qLabel ? measure.qDef.qLabel : measure.qDef.qLabelExpression
 				}
 			})
 		})
 
+	if(self.$scope.props.evaluateVariables){
+		if(!self.$scope.baseDimensions){
+			await self.$scope.createBaseDimensions(self.$scope.fullDimensions);
+		}
+		if(!self.$scope.baseMeasures){
+			await self.$scope.createBaseMeasures(self.$scope.fullMeasures);
+		}
 
-	if(!self.$scope.baseDimensions){
-		await self.$scope.createBaseDimensions(self.$scope.fullDimensions);
-	}
-	if(!self.$scope.baseMeasures){
-		await self.$scope.createBaseMeasures(self.$scope.fullMeasures);
-	}
 
+		// create menuItems from base table
 
-	// create menuItems from base table
-
-	self.$scope.menuDimensions = [];
-	self.$scope.menuMeasures = [];
-
-	self.$scope.fullDimensions.map(fullDim => {
-		return self.$scope.baseDimensions
-			.filter(tableDim => fullDim.qDef.cId === tableDim.cId && tableDim.qFallbackTitle)
-			.map(tableDim => {
-				self.$scope.menuDimensions.push({
-					cId: tableDim.cId,
-					label: tableDim.qFallbackTitle ? tableDim.qFallbackTitle : null,
-					isActive: fullDim.isActive,
-					type: "d"
-				})
+		self.$scope.menuDimensions = [];
+		self.$scope.menuMeasures = [];
+	
+		self.$scope.fullDimensions.map(fullDim => {
+			return self.$scope.baseDimensions
+				.filter(tableDim => fullDim.qDef.cId === tableDim.cId && tableDim.qFallbackTitle)
+				.map(tableDim => {
+					self.$scope.menuDimensions.push({
+						cId: tableDim.cId,
+						label: tableDim.qFallbackTitle ? tableDim.qFallbackTitle : null,
+						isActive: fullDim.isActive,
+						type: "d"
+					})
+				}
+			)
+		})
+	
+		self.$scope.fullMeasures.map(fullMeasure => {
+			return self.$scope.baseMeasures
+				.filter(tableMeasure => fullMeasure.qDef.cId === tableMeasure.cId && tableMeasure.qFallbackTitle)
+				.map(tableMeasure => {
+					self.$scope.menuMeasures.push({
+						cId: tableMeasure.cId,
+						label: tableMeasure.qFallbackTitle ? tableMeasure.qFallbackTitle : null,
+						isActive: fullMeasure.isActive,
+						type: "m"
+					})
+				}
+			)
+		})
+	}else {
+		self.$scope.menuDimensions = self.$scope.fullDimensions.map(dimension => {
+			return {
+				cId: dimension.qDef.cId,
+				label: dimension.qDef.qFieldLabels[0] ? dimension.qDef.qFieldLabels[0] : dimension.qDef.qFieldDefs[0],
+				isActive: undefined,
+				type: "d"
 			}
-		)
-	})
+		})
 
-	self.$scope.fullMeasures.map(fullMeasure => {
-		return self.$scope.baseMeasures
-			.filter(tableMeasure => fullMeasure.qDef.cId === tableMeasure.cId && tableMeasure.qFallbackTitle)
-			.map(tableMeasure => {
-				self.$scope.menuMeasures.push({
-					cId: tableMeasure.cId,
-					label: tableMeasure.qFallbackTitle ? tableMeasure.qFallbackTitle : null,
-					isActive: fullMeasure.isActive,
-					type: "m"
-				})
+
+		self.$scope.menuMeasures = self.$scope.fullMeasures.map(measure => {
+			return {
+				cId: measure.qDef.cId,
+				label: measure.qDef.qLabel ? measure.qDef.qLabel : measure.qDef.qLabelExpression,
+				isActive: undefined,
+				type: "m"
 			}
-		)
-	})
+		})
+	}
+
 
 	self.$scope.updateStateItems();
 	self.$scope.updateMenuState();
@@ -111,6 +133,8 @@ export default async function ($element, layout, self, qlik, $) {
 	}else{
 		self.$scope.saveStateToLocalStorage()
 	}
+
+
 
 	return qlik.Promise.resolve();
 

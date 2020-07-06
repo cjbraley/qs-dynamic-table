@@ -41,6 +41,20 @@ export default function (tableList) {
 							label: "No"
 						}],
 						defaultValue: true
+					},
+					evaluateVariables: {
+						type: "boolean",
+						component: "switch",
+						label: "Evaluate variables in fields",
+						ref: "props.evaluateVariables",
+						options: [{
+							value: true,
+							label: "Yes"
+						}, {
+							value: false,
+							label: "No"
+						}],
+						defaultValue: true
 					}
 				}
 			},
