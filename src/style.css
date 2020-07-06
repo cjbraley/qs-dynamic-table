@@ -33,7 +33,7 @@
 .cbcr__buttons {
     grid-area: buttons;
     display: flex;
-    margin-left: 5rem;
+    margin-left: 5.75rem;
     align-items: center;
 }
 
@@ -58,7 +58,7 @@
 }
 
 .cbcr__items-menu__list {
-    font-size: 0.833rem;
+    font-size: 0.8rem;
     border: 1px solid #b3b3b3;
     border-radius: 3px;
     min-height: 38px;
@@ -108,10 +108,9 @@
 }
 
 .cbcr__config__title{
-    width: 3.75rem;
+    width: 5rem;
     font-weight: bold;
     font-size: 0.825rem;
-    margin-right: 0.5rem;
 }
 
 .cbcr__config__list{

@@ -5,6 +5,7 @@ export default function (app, qlik) {
 		"$element",
 		function ($scope, $element) {
 
+
 			// INIT
 			$scope.app = app;
 			$scope.localStorageKey = `QSCR_${app.id}_${$scope.$parent.layout.qInfo.qId}`;

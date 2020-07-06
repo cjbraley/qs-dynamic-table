@@ -64,7 +64,7 @@
     <div class="cbcr__config">
 
         <div class="cbcr_config__row">
-            <span class="cbcr__config__title">Columns:</span>
+            <span class="cbcr__config__title">{{ state.mode === 'pivot-table' ? 'Rows' : 'Dimensions'}}:</span>
             <ul class="cbcr__config__list connected-sortable" id="cbcr__column">
                 <li ng-repeat="item in state.column track by item.cId" class="cbcr__config__item"
                     ng-class="{'cbcr__config__item--dimension': item.type === 'd', 'cbcr__config__item--measure': item.type === 'm'}">
@@ -77,7 +77,7 @@
         </div>
 
         <div class="cbcr_config__row" ng-show="state.mode === 'pivot-table'">
-            <span class="cbcr__config__title">Rows:</span>
+            <span class="cbcr__config__title">Columns:</span>
             <ul class="cbcr__config__list connected-sortable" id="cbcr__row">
                 <li ng-repeat="item in state.row track by item.cId"
                     class="cbcr__config__item cbcr__config__item--dimension">

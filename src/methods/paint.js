@@ -4,6 +4,7 @@ export default async function ($element, layout, self, qlik, $) {
 	//////////////////
 	// Init
 	/////////////////
+
 	const tableId = layout.props.tableId;
 
 	if(layout.props.presetStates.length > 0){
@@ -22,6 +23,7 @@ export default async function ($element, layout, self, qlik, $) {
 
 	const state = self.$scope.state;
 	const hypercube = layout.qHyperCube;
+
 
 	await self.$scope.app.getObjectProperties(tableId)
 		.then(reply => {
