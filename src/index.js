@@ -8,8 +8,6 @@ import {
 } from "./methods";
 import "./style.css";
 
-// import sortable from '../static/sortable.min';
-
 // This is the object that is ultimately returned to qlik -- this is the extension 
 
 window.define(['qlik', 'jquery'], async function(qlik, $) {

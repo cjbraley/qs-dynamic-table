@@ -9,6 +9,6 @@
   },
   "deploy": "desktop",
   "desktopConfig": {
-    "destination": "C:\\Users\\ChrisBraley\\Documents\\Qlik\\Sense\\Extensions"
+    "destination": "C:\\Users\\Chris\\Documents\\Qlik\\Sense\\Extensions"
   }
 }

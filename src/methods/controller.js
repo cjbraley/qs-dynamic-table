@@ -44,7 +44,7 @@ export default function (app, qlik) {
 						$scope.$apply();
 					}
 				}
-			}).disableSelection();
+			});
 
 			// PAINT FUNCTIONS
 

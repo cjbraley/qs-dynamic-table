@@ -12,8 +12,5 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.11.1",
     "qext-scripts": "1.0.0-beta.3"
-  },
-  "dependencies": {
-    "sortablejs": "^1.10.2"
   }
 }
