@@ -387,7 +387,28 @@ export default function (app, qlik) {
 						qOp: "replace",
 						qPath: "qHyperCubeDef/qIndentMode",
 						qValue: JSON.stringify(false)
+					},
+					{
+						qOp: "replace",
+						qPath: "/components",
+						qValue: 	JSON.stringify(			
+							 [{
+									key: "theme",
+									content: {
+										fontColor: {index: -1, color: $scope.props.fontColor},
+										fontSize: $scope.props.fontSize,
+										hoverEffect: $scope.props.hoverEffect,
+										hoverColor: {index: -1, color: $scope.props.hoverColor},
+										hoverFontColor: {index: -1, color: $scope.props.hoverFontColor}
+									}
+							}
+						])
 					}
+					// {
+					// 	qOp: "replace",
+					// 	qPath: "qHyperCubeDef/qIndentMode",
+					// 	qValue: JSON.stringify(true)
+					// }
 					];
 				}
 
@@ -395,6 +416,9 @@ export default function (app, qlik) {
 				$scope.app.getObject($scope.table.id)
 					.then(table => {
 						table.clearSoftPatches();
+						// console.log(table);
+						table.applyPatches(patches, false);
+						console.log(table);
 						return table.applyPatches(patches, false);
 					})
 					// .then(table => {
@@ -461,7 +485,8 @@ export default function (app, qlik) {
 			// };
 
 			$scope.createTable = async function(nextCall){
-				$scope.table = await $scope.app.visualization.create($scope.state.mode,[]);
+				console.log($scope.props)
+				$scope.table = await $scope.app.visualization.create($scope.state.mode,[],{});
 				$scope.isLoading = false;
 				$scope.table.show("cbcr__table")
 					.then(reply => {

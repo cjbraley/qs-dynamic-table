@@ -22,6 +22,14 @@ export default async function ($element, layout, self, qlik, $) {
 	self.$scope.props.evaluateVariables = layout.props.evaluateVariables === undefined ? true : layout.props.evaluateVariables;
 	self.$scope.props.showCopyToClipboard = layout.props.showCopyToClipboard;
 
+	self.$scope.props.customStyles = layout.props.customStyles || false;
+	self.$scope.props.fontSize = layout.props.fontSize || 'unset';
+	self.$scope.props.fontColor = layout.props.fontColor || 'unset';
+	self.$scope.props.hoverEffect = layout.props.hoverEffect;
+	self.$scope.props.hoverColor = layout.props.hoverEffect && layout.props.hoverColor ? layout.props.hoverColor : 'unset';
+	self.$scope.props.hoverFontColor = layout.props.hoverEffect && layout.props.hoverFontColor ? layout.props.hoverFontColor : 'unset';
+
+
 	const state = self.$scope.state;
 	const hypercube = layout.qHyperCube;
 

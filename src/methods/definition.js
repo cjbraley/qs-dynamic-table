@@ -99,6 +99,90 @@ export default function (tableList) {
 			appearance: {
 				uses: "settings",
 				type: "items",
+				items: {
+					styles: {
+						label: 'Presentation',
+						type: "items",
+						items: {
+							customStyles: {
+								type: "boolean",
+								component: "switch",
+								label: "Custom Styling",
+								ref: "props.customStyles",
+								options: [{
+									value: true,
+									label: "Yes"
+								}, {
+									value: false,
+									label: "No"
+								}],
+								defaultValue: false,
+		
+							},
+							fontSize: {
+								label: "Content font size",
+								ref: "props.fontSize",
+								type: "string",
+								expression: "optional",
+								component: 'expression',
+								defaultValue: "",
+								show: (layout) => {
+									return layout.props.customStyles
+								}
+							},
+							fontColor: {
+								label: "Content font color ",
+								ref: "props.fontColor",
+								type: "string",
+								expression: "optional",
+								component: 'expression',
+								defaultValue: "",
+								show: (layout) => {
+									return layout.props.customStyles
+								}
+							},
+							hoverEffect: {
+								type: "boolean",
+								component: "switch",
+								label: "hoverEffect",
+								ref: "props.hoverEffect",
+								options: [{
+									value: true,
+									label: "Yes"
+								}, {
+									value: false,
+									label: "No"
+								}],
+								defaultValue: false,
+								show: (layout) => {
+									return layout.props.customStyles
+								}
+							},
+							hoverColor: {
+								label: "Row hover color ",
+								ref: "props.hoverColor",
+								type: "string",
+								expression: "optional",
+								component: 'expression',
+								defaultValue: "='#eee'",
+								show: (layout) => {
+									return layout.props.customStyles && layout.props.hoverEffect
+								}
+							},
+							hoverFontColor: {
+								label: "Row hover font color ",
+								ref: "props.hoverFontColor",
+								type: "string",
+								expression: "optional",
+								component: 'expression',
+								defaultValue: "",
+								show: (layout) => {
+									return layout.props.customStyles && layout.props.hoverEffect
+								}
+							}
+						}
+					}
+				}
 			},
 			about: {
 				type: "items",
