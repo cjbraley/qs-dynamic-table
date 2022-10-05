@@ -416,9 +416,7 @@ export default function (app, qlik) {
 				$scope.app.getObject($scope.table.id)
 					.then(table => {
 						table.clearSoftPatches();
-						// console.log(table);
 						table.applyPatches(patches, false);
-						console.log(table);
 						return table.applyPatches(patches, false);
 					})
 					// .then(table => {
@@ -485,7 +483,6 @@ export default function (app, qlik) {
 			// };
 
 			$scope.createTable = async function(nextCall){
-				console.log($scope.props)
 				$scope.table = await $scope.app.visualization.create($scope.state.mode,[],{});
 				$scope.isLoading = false;
 				$scope.table.show("cbcr__table")
