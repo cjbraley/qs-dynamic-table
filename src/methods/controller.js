@@ -388,22 +388,6 @@ export default function (app, qlik) {
 						qPath: "qHyperCubeDef/qIndentMode",
 						qValue: JSON.stringify(false)
 					},
-					{
-						qOp: "replace",
-						qPath: "/components",
-						qValue: 	JSON.stringify(			
-							 [{
-									key: "theme",
-									content: {
-										fontColor: {index: -1, color: $scope.props.fontColor},
-										fontSize: $scope.props.fontSize,
-										hoverEffect: $scope.props.hoverEffect,
-										hoverColor: {index: -1, color: $scope.props.hoverColor},
-										hoverFontColor: {index: -1, color: $scope.props.hoverFontColor}
-									}
-							}
-						])
-					}
 					// {
 					// 	qOp: "replace",
 					// 	qPath: "qHyperCubeDef/qIndentMode",
@@ -411,6 +395,23 @@ export default function (app, qlik) {
 					// }
 					];
 				}
+
+				patches.push(					{
+					qOp: "replace",
+					qPath: "/components",
+					qValue: 	JSON.stringify(			
+						 [{
+								key: "theme",
+								content: {
+									fontColor: {index: -1, color: $scope.props.fontColor},
+									fontSize: $scope.props.fontSize,
+									hoverEffect: $scope.props.hoverEffect,
+									hoverColor: {index: -1, color: $scope.props.hoverColor},
+									hoverFontColor: {index: -1, color: $scope.props.hoverFontColor}
+								}
+						}
+					])
+				})
 
 
 				$scope.app.getObject($scope.table.id)
