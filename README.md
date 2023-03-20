@@ -1,4 +1,7 @@
+**THIS EXTENSION IS NO LONGER SUPPORTED AS I DO NOT HAVE ACCESS TO A QLIK ENVIRONMENT**
+
 # qs-custom-report
+
 Qlik Sense extension that allows users to create their own tables from a list of dimensions and measures
 
 ![Thumb](https://github.com/cjbraley/qs-custom-report/blob/master/demo/thumb.jpg)
